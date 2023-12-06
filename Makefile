@@ -203,3 +203,15 @@ clobber: clean
 	$(MAKE) -C mock $@
 
 .PHONY: build test bench clean clobber
+
+BUILD_PLATFORM ?= "linux/amd64"
+OPERATOR_IMAGE ?= docker.io/barkbay/csc
+docker-push:
+	docker buildx build . \
+	 	-f Dockerfile \
+		--progress=plain \
+		--build-arg GO_LDFLAGS='$(GO_LDFLAGS)' \
+		--build-arg GO_TAGS='$(GO_TAGS)' \
+		--platform $(BUILD_PLATFORM) \
+		--push \
+		-t $(OPERATOR_IMAGE)

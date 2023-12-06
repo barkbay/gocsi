@@ -1,0 +1,37 @@
+## csc -e unix:///var/lib/kubelet/plugins/pd.csi.storage.gke.io/csi.sock identity  plugin-capabilities
+#  CONTROLLER_SERVICE
+#  VOLUME_ACCESSIBILITY_CONSTRAINTS
+#  ONLINE
+#  OFFLINE
+#
+## csc -e unix:///var/lib/kubelet/plugins/pd.csi.storage.gke.io/csi.sock identity plugin-info
+## csc -e unix:///var/lib/kubelet/plugins/pd.csi.storage.gke.io/csi.sock node get-info
+##
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: csc
+  namespace: kube-system
+  labels:
+    k8s-app: csc
+spec:
+  selector:
+    matchLabels:
+      name: csc
+  template:
+    metadata:
+      labels:
+        name: csc
+    spec:
+      volumes:
+        - name: kubelet-volume
+          hostPath:
+            path: /var/lib/kubelet/
+      containers:
+        - name: sleep
+          image: docker.io/barkbay/csc@sha256:e28217ca408df23d5086cbfd7fd02a8d4d674c6c22b9b2455dbf9dc4893eada0
+          imagePullPolicy: Always
+          command: ['sleep', 'infinity']
+          volumeMounts:
+            - mountPath: /var/lib/kubelet/
+              name: kubelet-volume
